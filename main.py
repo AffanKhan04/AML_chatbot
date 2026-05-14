@@ -1,3 +1,4 @@
+import utils.session
 from fastapi import FastAPI , UploadFile , File , HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from rag_pipeline import ask_llm , extract_requirements , generate_actionable_task

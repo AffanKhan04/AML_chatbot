@@ -249,13 +249,13 @@ def ask_llm(query:str,chat_id:str=None):
     memory=get_session_memory(chat_id,k=3)
     history_text=memory.load_memory_variables({}).get("history","")
     print("✅ history: ",history_text)
-    #step 3: Use the retrieved context as the corpus for guardrails
-    # try:
-    #     validate_query_with_guardrails(query,context,history_text)
-    # except Exception as e:
-    #     return {
-    #         "result": f"❌ Query rejected: it does not relate to the context\n\nReason: {str(e)}"
-    #     }
+    #step 3: Validate query against content policies via prompt-based guardrails
+    try:
+        validate_query_with_guardrails(query, context, history_text)
+    except Exception as e:
+        return {
+            "result": f"❌ Query rejected: {str(e)}"
+        }
         
         
     print("query: ",query)

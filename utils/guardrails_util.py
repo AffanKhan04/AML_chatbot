@@ -1,71 +1,49 @@
-from guardrails import Guard
-from guardrails.hub import DetectJailbreak, LlamaGuard7B, BanList
-from dotenv import load_dotenv
-import os
-load_dotenv()  # This loads the .env file
+from llm_client import ask
+
+BANNED_PHRASES = [
+    'loopholes', 'launder money', 'missing elements', 'bypass AML',
+    'exploit SBP rules', 'weakness in compliance', 'joke', 'funny',
+    'make me laugh', 'meme', 'humor', 'story about', 'poem', 'lack'
+]
+
+_GUARDRAIL_PROMPT = """You are a strict content moderation system for an AML (Anti-Money Laundering) compliance chatbot.
+
+Evaluate the following user query and determine if it violates any of the rules below.
+
+### Rules:
+1. No requests related to illegal drugs, drug trafficking, or drug use.
+2. No violent, hateful, or discriminatory content.
+3. No sexual or explicit content.
+4. No criminal planning, money laundering schemes, or financial crime assistance.
+5. No requests about illegal weapons, firearms trafficking, or arms dealing.
+6. No content that encourages self-harm or suicide.
+7. No off-topic or entertainment-based requests (jokes, poems, memes, stories, humor).
+8. No requests to bypass, exploit, or find loopholes in AML/CFT regulations.
+9. No requests containing these phrases: {banned_phrases}
+
+### Instructions:
+- If the query violates ANY rule, respond with exactly: UNSAFE: <brief reason>
+- If the query is safe and appropriate for an AML compliance assistant, respond with exactly: SAFE
+
+Respond with ONLY "SAFE" or "UNSAFE: <reason>". No other text.
+
+User query: {query}"""
 
 
-def validate_query_with_guardrails(query: str, context: str , history_text:str):
-    # 1. Jailbreak detection
-    # Guard().use(DetectJailbreak(on_fail="exception")).validate(query)
-    # print("✅ Passed Jail Break Guardrail")
+def validate_query_with_guardrails(query: str, context: str, history_text: str):
+    query_lower = query.lower()
+    for phrase in BANNED_PHRASES:
+        if phrase in query_lower:
+            raise ValueError(f"Query contains a banned phrase: '{phrase}'")
 
-    # 2. Harmful/illegal content classification
-    Guard().use(LlamaGuard7B(
-        # categories=["non_violent_crimes", "financial_crime"],
-        policies=[LlamaGuard7B.POLICY__NO_ILLEGAL_DRUGS , LlamaGuard7B.POLICY__NO_VIOLENCE_HATE, LlamaGuard7B.POLICY__NO_SEXUAL_CONTENT, LlamaGuard7B.POLICY__NO_CRIMINAL_PLANNING, LlamaGuard7B.POLICY__NO_GUNS_AND_ILLEGAL_WEAPONS,LlamaGuard7B.POLICY__NO_ENOURAGE_SELF_HARM],
-        on_fail="exception"
-    )).validate(query)
-    print("✅ Passed Llama Guard Guardrail")
-    # 3. Ban list enforcement
-    Guard().use(BanList(
-        banned_words=[
-            'loopholes',
-            'launder money',
-            'missing elements',
-            'bypass AML',
-            'exploit SBP rules',
-            'weakness in compliance',
-            'joke',
-            'funny',
-            'make me laugh',
-            'meme', 
-            'humor',
-            'story about',
-            'poem',
-            'lack'
-        ],
-        max_l_dist=0,
-        on_fail="exception"
-    )).validate(query)
-    print("✅ Passed Ban List Guardrail")
+    prompt = _GUARDRAIL_PROMPT.format(
+        banned_phrases=", ".join(f'"{p}"' for p in BANNED_PHRASES),
+        query=query
+    )
+    result = ask(prompt).strip()
 
-   # 4. Similarity to document context
-    # try:
-    # Guard().use(SimilarToDocument(
-    #     document=f"{expanded_context}\n\nDocument context:\n{context}",
-    #     threshold=0.5,
-    #     model="all-MiniLM-L6-v2",
-    #     on_fail="exception"
-    # )).validate(query)
-    # print("✅ Passed Similar to document context Guardrail")
-    # # except Exception:
-    #   # If fails, try evaluating relevance against history + context using LlmRagEvaluator
-    #     print("⚠️ Similarity failed, using LlmRagEvaluator on history+context...",os.getenv("OPENAI_API_KEY"))
-    #     guard = Guard().use(
-    #         LlmRagEvaluator(
-    #             eval_llm_prompt_generator=HallucinationPrompt(prompt_name="hallucination_judge_llm"),
-    #             llm_evaluator_fail_response="hallucinated",
-    #             llm_evaluator_pass_response="factual",
-    #             llm_callable="gpt-4o-mini",
-    #             on_fail="exception"
-    #         )
-    #     )
-    #     metadata = {
-    #         "user_message": query,
-    #         "context": f"{context}\n\n{history_context_text}",
-    #         "llm_response": query  # treat question as 'response' for relevance check
-    #     }
-    #     guard.validate(llm_output=query, metadata=metadata)
+    if result.upper().startswith("UNSAFE"):
+        reason = result[result.find(":")+1:].strip() if ":" in result else "Content policy violation"
+        raise ValueError(reason)
 
     return True

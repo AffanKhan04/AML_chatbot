@@ -3,7 +3,7 @@ import json
 import re
 from typing import List
 from PyPDF2 import PdfReader
-from langchain.schema import Document
+from langchain_core.documents import Document
 from llm_client import ask
 
 

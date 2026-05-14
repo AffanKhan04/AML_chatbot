@@ -1,5 +1,5 @@
 from utils.chroma_utils import initialize_chroma , bm25_retriever
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 def retrieve_document(user_query:str,parsed_query:dict)-> tuple[list[Document], float]:
     print("IN RA")

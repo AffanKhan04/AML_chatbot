@@ -1,4 +1,3 @@
-.env
 .venv/
 venv/
 .venv310/
@@ -7,3 +6,5 @@ __pycache__/
 venvBar/
 chat_history.json
 chroma_chat_history/
+config.bat
+node_modules
