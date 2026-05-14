@@ -1,12 +1,24 @@
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_community.retrievers import BM25Retriever
 import os,shutil,re
 from fastapi.responses import JSONResponse
 import uuid ,datetime
 from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain.memory import ConversationBufferWindowMemory
+class ConversationBufferWindowMemory:
+    """Minimal replacement for the removed langchain ConversationBufferWindowMemory."""
+    def __init__(self, k=5, return_messages=False, chat_memory=None):
+        self.k = k
+        self.chat_memory = chat_memory or ChatMessageHistory()
+
+    def load_memory_variables(self, _inputs):
+        messages = self.chat_memory.messages[-(self.k * 2):]
+        lines = []
+        for msg in messages:
+            role = "Human" if msg.type == "human" else "AI"
+            lines.append(f"{role}: {msg.content}")
+        return {"history": "\n".join(lines)}
 
 
 #initializing embedding model

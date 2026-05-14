@@ -22,5 +22,4 @@ PyPDF2
 langchain_huggingface
 pyodbc
 bs4
-guardrails-ai 
 groq
