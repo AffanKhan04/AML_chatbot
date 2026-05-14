@@ -1,0 +1,9 @@
+.env
+.venv/
+venv/
+.venv310/
+__pycache__/
+*.py[cod]chroma/
+venvBar/
+chat_history.json
+chroma_chat_history/
