@@ -17,19 +17,19 @@
 
 \title{Agentic AI Chatbot for Anti-Money Laundering Legal Information Retrieval and Task Generation}
 
-\author{\IEEEauthorblockN{1\textsuperscript{st} Ashar Usmani}
+\author{\IEEEauthorblockN{Ashar Usmani}
 \IEEEauthorblockA{\textit{Computer Science} \\
 \textit{FAST NUCES}\\
 Karachi, Pakistan \\
 k224581@nu.edu.pk}
 \and
-\IEEEauthorblockN{2\textsuperscript{nd} Affan Hassan}
+\IEEEauthorblockN{Affan Hassan}
 \IEEEauthorblockA{\textit{Computer Science} \\
 \textit{FAST NUCES}\\
 Karachi, Pakistan \\
 k224445@nu.edu.pk}
 \and
-\IEEEauthorblockN{3\textsuperscript{rd} Hamza Hussain}
+\IEEEauthorblockN{Hamza Hussain}
 \IEEEauthorblockA{\textit{Computer Science} \\
 \textit{FAST NUCES}\\
 Karachi, Pakistan \\
@@ -39,7 +39,7 @@ k224317@nu.edu.pk}
 \maketitle
 
 \begin{abstract}
-This paper presents the development of an agentic AI chatbot designed for navigating and extracting actionable insights from complex legal documents, specifically focusing on Anti-Money Laundering (AML) regulations. The system utilizes a Retrieval-Augmented Generation (RAG) architecture powered by Large Language Models (LLMs) to accurately interpret user queries, retrieve relevant legal text using a hybrid search mechanism, and generate actionable compliance tasks. The integration of specialized agents for query understanding and information retrieval ensures contextual relevance, while safety guardrails prevent hallucinations. By rigorously parsing intent and enforcing strict output formats, we demonstrate the practical application of this AI assistant in improving and automating regulatory compliance operations within financial institutions.
+This paper details the design of an agent-driven AI chatbot that is adept at comprehending and deriving meaningful insights from intricate legal documents, more particularly, Anti-Money Laundering (AML) guidelines. Our AI bot is built upon the Retrieval Augmentation Generation (RAG) model that leverages large language models (LLMs) in order to effectively comprehend user intent and then employ a hybrid search approach to extract relevant legal text and finally generate actionable compliance tasks. We have developed custom agents to facilitate this purpose of information retrieval with the support of guard rails that avoid hallucinations.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -49,12 +49,12 @@ Agentic AI, Anti-Money Laundering, RAG, Hybrid Search, Compliance, Large Languag
 \section{Introduction}
 Regulatory compliance in the financial sector, particularly concerning Anti-Money Laundering (AML) and Counter Financing of Terrorism (CFT), is a critically demanding and resource-intensive task. Financial institutions are continuously required to adhere to an ever-evolving set of state regulations, banking circulars, and compliance frameworks. Traditionally, compliance officers must manually sift through massive volumes of legal and regulatory texts to extract specific requirements, design implementation plans, and ensure that internal operational procedures align seamlessly with legal mandates. The manual nature of this process leads to significant time expenditure, high operational costs, and the susceptibility to human error.
 
-Recent advancements in Large Language Models (LLMs) \cite{b5} and Agentic Artificial Intelligence have opened new avenues for automating the retrieval and comprehension of such complex documentation. Standard LLMs often struggle with legal domains \cite{b6} due to the phenomenon of "hallucination" and a lack of grounding in specific organizational documents. By leveraging Retrieval-Augmented Generation (RAG) \cite{b1}, \cite{b3}, AI systems can be grounded in factual domain-specific documentation, minimizing the risk of hallucinations while providing highly specific regulatory advice. Furthermore, Agentic AI extends this capability by employing autonomous agents capable of specific reasoning tasks \cite{b2}---such as query intent classification, database lookups, and task synthesis---enabling a multi-step execution pipeline rather than a simple text-in, text-out interface.
+Recent advancements in Large Language Models (LLMs) \cite{b1} and Agentic Artificial Intelligence have have enabled new ways for automating the retrieval and comprehension of such complex documentation. Standard LLMs often struggle with legal domains \cite{b2} due to "hallucination" and a lack of grounding in specific organizational documents. By leveraging Retrieval-Augmented Generation (RAG) \cite{b3}, \cite{b4}, AI systems can be grounded in factual domain-specific documentation, minimizing the risk of hallucinations while providing highly specific regulatory advice. Furthermore, Agentic AI extends this capability by employing autonomous agents capable of specific reasoning tasks \cite{b5} such as query intent classification, database lookups, and task synthesis which enables a multi-step execution pipeline rather than a simple text-in, text-out interface.
 
 In this paper, we propose a multi-agent AI chatbot system capable of interpreting complex legal queries, fetching relevant AML guidelines from a vectorized database, and synthesising formal advisory responses. Furthermore, the system includes a sophisticated compliance task generation module. This agent translates abstract regulatory literature retrieved from the database into concrete, actionable steps, mapping them directly to specific organizational departments (e.g., IT, Risk, Compliance) alongside suggested execution frequencies.
 
 \section{Methodology}
-The proposed agentic architecture fundamentally separates the cognitive load of a typical RAG system into dedicated specialized agents. The overall methodology is depicted in Fig. \ref{fig:arch}.
+The proposed agentic architecture fundamentally separates the load of a typical RAG system into dedicated specialized agents. The overall methodology/architecture is depicted in Fig. \ref{fig:arch}.
 
 \begin{figure*}[htbp]
 \centering
@@ -94,13 +94,13 @@ The proposed agentic architecture fundamentally separates the cognitive load of 
 \end{figure*}
 
 \subsection{Data Extraction and Ingestion Pipeline}
-The foundation of any compliance RAG system is the quality of its underlying data. The original regulatory texts and banking circulars are sourced from a corporate SQL Server database. Real-world legal documents often contain HTML formatting, dummy data (e.g., "lorem ipsum"), or severely under-detailed text. To address this, an automated ETL (Extract, Transform, Load) script uses the Python \texttt{BeautifulSoup} library. It parses HTML descriptions, strips unnecessary boilerplate, drops records with less than 10 characters, and structures them into clean JSON objects. These objects maintain critical metadata, such as \texttt{compliance\_category}, \texttt{regulation\_number}, and \texttt{title}. 
+The base of any legal or compliance RAG system is the quality of its underlying data. The original regulatory texts and banking circulars are sourced from a corporate SQL Server database. Real-world legal documents often contain HTML formatting, dummy data (e.g., "lorem ipsum"), or severely under-detailed text. To address this, an automated ETL (Extract, Transform, Load) script uses the Python \texttt{BeautifulSoup} library. It parses HTML descriptions, strips unnecessary boilerplate, drops records with less than 10 characters, and structures them into clean JSON objects. These objects maintain critical metadata, such as \texttt{compliance\_category}, \texttt{regulation\_number}, and \texttt{title}. 
 
 \subsection{Vectorization and Storage}
-The cleaned compliance data is ingested into ChromaDB. Each document chunk is embedded using high-dimensional dense vector embeddings. Alongside the dense vectors, the system retains a copy of the texts for sparse lexical search using the BM25 algorithm. Storing rich metadata alongside the vectors is crucial for the hybrid searching methodology employed later in the pipeline.
+The cleaned compliance data is ingested into ChromaDB. Each document chunk is embedded using high-dimensional dense vector embeddings. Alongside the dense vectors, the system maintains a copy of the texts for sparse lexical search using the BM25 algorithm. Storing rich metadata alongside the vectors is crucial for the hybrid searching methodology employed later in the pipeline.
 
 \subsection{Query Understanding Agent}
-Users interacting with legal systems rarely formulate mechanically perfect queries. To accurately deduce user intentions, a dedicated Query Understanding Agent is employed. Instead of immediately running a vector similarity search---which often fails when users cite specific numerical clauses---this agent prompts an LLM to strictly parse the user's intent. The intent is forcefully categorized into "retrieve," "summarize," "compare," or "unknown." More importantly, the agent performs Named Entity Recognition (NER) to isolate specific references such as regulation numbers (e.g., "Regulation 13"), point numbers, or titles. The agent guarantees output in a strict JSON schema format mapping the parsed data.
+Users interacting with legal systems rarely formulate perfect queries. To accurately deduce user intentions, a dedicated Query Understanding Agent is employed. Instead of immediately running a vector similarity search which often fails when users cite specific numerical clauses, this agent prompts an LLM to strictly parse the user's intent. The intent is forcefully categorized into "retrieve," "summarize," "compare," or "unknown." More importantly, the agent performs Named Entity Recognition (NER) to isolate specific references such as regulation numbers (e.g., "Regulation 13"), point numbers, or titles. The agent guarantees output in a strict JSON schema format mapping the parsed data.
 
 \subsection{Hybrid Retriever Agent}
 Information retrieval is critical for grounding the generator. Relying purely on semantic vector search often yields low precision for legal queries since "Regulation 14" and "Regulation 13" share massive semantic similarity despite referring to completely different legal constraints. The Retriever Agent implements a Hybrid Search mechanism combining dense vector similarity with lexical matching (BM25) \cite{b4} and exact metadata filtering. 
@@ -174,7 +174,6 @@ We would like to extend our sincere gratitude to Dr.\ Farrukh Shahid for his inv
 \bibitem{b3} Gao, Y., et al. `Retrieval-augmented generation for large language models: A survey.'' \emph{arXiv preprint arXiv:2312.10997}, 2023.
 \bibitem{b4} Robertson, S., et al. `The Probabilistic Relevance Framework: BM25 and Beyond.'' \emph{Foundations and Trends in Information Retrieval}, vol. 3, no. 4, pp. 333--389, 2009.
 \bibitem{b5} Vaswani, A., et al. `Attention is All you Need.'' \emph{Advances in Neural Information Processing Systems}, vol. 30, 2017.
-\bibitem{b6} Buiten, A. `Towards Intelligent Regulation: AI in Anti-Money Laundering and Legal Technology.'' \emph{Journal of Financial Regulation and Compliance}, vol. 28, no. 1, pp. 45--62, 2021.
 \end{thebibliography}
 
 \end{document}
